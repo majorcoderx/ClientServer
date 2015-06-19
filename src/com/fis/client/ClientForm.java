@@ -19,28 +19,34 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JPasswordField;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.util.LinkedList;
 
 public class ClientForm {
 
 	private JFrame frame;
 	
-	public JTextField textFieldMsg;
+	public static JTextField textFieldMsg;
 	public JTextField textFieldAcc;
 	public JTextField textFieldHost;
 	private JPasswordField passwordField;
 	private List listUserOnline;
 	
+	
 	private Client client = null;
 	public static JTextPane txtPanelChat;
 	
-	private boolean checkLogin = false;
+	private String userSelect = "";
+	
+	public static boolean checkLogin = false;
 	/**
 	 * Launch the application.
 	 */
@@ -168,6 +174,7 @@ public class ClientForm {
 		btnAddToChat.setBounds(562, 376, 141, 30);
 		frame.getContentPane().add(btnAddToChat);
 		
+		/*****connect to server for login*****/
 		buttonConnect.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -201,14 +208,15 @@ public class ClientForm {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if(checkLogin){
-					
+					client.send(textFieldMsg.getText());
+					textFieldMsg.setText("");
 				}
-				String msg = "{\"\":\"\","
-						+ " \"\": \"\","
-						+ " \"\":\"\"  }";
-				for(int i  = 0; i< listUserOnline.getItemCount() ; ++i){
-					
-				}
+//				String msg = "{\"\":\"\","
+//						+ " \"\": \"\","
+//						+ " \"\":\"\"  }";
+//				for(int i  = 0; i< listUserOnline.getItemCount() ; ++i){
+//					
+//				}
 			}
 		});
 		/**** login button ***/
@@ -221,13 +229,14 @@ public class ClientForm {
 							+ " \"pass\":\""+ passwordField.getText()+"\"  }";
 					client.send(msg);
 				}
-				
 			}
 		});
 		/*****change selected item in list online*****/
 		listUserOnline.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				
+				int id = Integer.parseInt(e.getItem().toString());
+				userSelect = listUserOnline.getItem(id).getBytes().toString();
+				System.out.println(userSelect);
 			}
 		});
 	}

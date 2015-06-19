@@ -1,11 +1,13 @@
+/*Hi guys,
+ * There's some line code for a thread server
+ * It as mini server of list server at SUPER SERVER chat
+ */
+
 package com.fis.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-
-
 
 import java.util.Vector;
 
@@ -27,8 +29,7 @@ public class Server extends Thread{
 	
 	public void run() {
 		vSocket = new Vector<clientThread>();
-		OnlineUser onl = new OnlineUser();
-		onl.start();
+		
 		new ConnectDB();
 		try{
 			serverSocket = new ServerSocket(this.port);
@@ -36,8 +37,9 @@ public class Server extends Thread{
 				clientSocket = serverSocket.accept();
 				vSocket.add(0, new clientThread(clientSocket));
 				vSocket.firstElement().start();
+				OnlineUser onl = new OnlineUser();
+				onl.start();
 			}
-			
 		}catch(IOException e){
 			e.printStackTrace();
 		}
