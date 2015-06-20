@@ -3,7 +3,6 @@ package com.fis.client;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.JTextPane;
 
 import java.awt.List;
 
@@ -11,7 +10,6 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.ImageIcon;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -21,32 +19,24 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JPasswordField;
-import javax.swing.JList;
-import javax.swing.JRadioButton;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import com.fis.client.message.OnlineUser;
+
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
-import java.util.LinkedList;
+import java.io.ObjectInputStream.GetField;
+import java.util.Map;
+
+import javax.swing.JTextArea;
+import javax.swing.JScrollBar;
+import javax.swing.DropMode;
+import javax.swing.JScrollPane;
 
 public class ClientForm {
 
-	private JFrame frame;
+	private JFrame frame;	
+	private List listGroup;
 	
-	public static JTextField textFieldMsg;
-	public JTextField textFieldAcc;
-	public JTextField textFieldHost;
-	private JPasswordField passwordField;
-	private List listUserOnline;
-	
-	
-	private Client client = null;
-	public static JTextPane txtPanelChat;
-	
-	private String userSelect = "";
-	
-	public static boolean checkLogin = false;
 	/**
 	 * Launch the application.
 	 */
@@ -69,6 +59,10 @@ public class ClientForm {
 	 */
 	public ClientForm() {
 		initialize();
+		textFieldAcc.setText("account");
+		passwordField.setText("123456");
+		client = new Client(textFieldHost.getText());
+		client.start();
 	}
 
 	/**
@@ -77,36 +71,36 @@ public class ClientForm {
 	private void initialize() {
 		frame = new JFrame("Fis chat");
 		
-		frame.setBounds(100, 100, 724, 459);
+		frame.setBounds(100, 100, 628, 459);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		txtPanelChat = new JTextPane();
-		txtPanelChat.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		txtPanelChat.setBounds(10, 135, 386, 237);
-		frame.getContentPane().add(txtPanelChat);
 		
 		listUserOnline = new List();
+		listUserOnline.setFont(new Font("Dialog", Font.BOLD, 14));
+		listUserOnline.setForeground(Color.RED);
 		
 		listUserOnline.select(0);
-		listUserOnline.setBounds(562, 8, 141, 354);
+		listUserOnline.setBounds(483, 8, 124, 360);
 		frame.getContentPane().add(listUserOnline);
-		//demo
-		listUserOnline.add("DO", 1);
-		listUserOnline.add("Thanh", 2);
-		listUserOnline.add("Hung",3);
 		
 		
 		textFieldMsg = new JTextField();
-		textFieldMsg.setBounds(10, 379, 448, 30);
+		textFieldMsg.setBounds(10, 379, 334, 30);
 		frame.getContentPane().add(textFieldMsg);
 		textFieldMsg.setColumns(10);
 		
 		JButton buttonSend = new JButton("Send");
 		
-		buttonSend.setBounds(468, 379, 81, 30);
+		buttonSend.setBounds(354, 379, 81, 30);
 		frame.getContentPane().add(buttonSend);
 		
 		textFieldAcc = new JTextField();
+		textFieldAcc.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				textFieldAcc.setText("");
+			}
+		});
 		textFieldAcc.setBounds(83, 56, 116, 25);
 		frame.getContentPane().add(textFieldAcc);
 		textFieldAcc.setColumns(10);
@@ -114,7 +108,7 @@ public class ClientForm {
 		textFieldHost = new JTextField();
 		textFieldHost.setFont(new Font("Tahoma", Font.ITALIC, 13));
 		textFieldHost.setText("localhost");
-		textFieldHost.setBounds(83, 12, 222, 25);
+		textFieldHost.setBounds(83, 12, 387, 25);
 		frame.getContentPane().add(textFieldHost);
 		textFieldHost.setColumns(10);
 		
@@ -137,21 +131,17 @@ public class ClientForm {
 		buttonLogin.setBounds(223, 56, 81, 25);
 		frame.getContentPane().add(buttonLogin);
 		
-		JButton buttonConnect = new JButton("Connect");
-		buttonConnect.setBounds(315, 12, 81, 26);
-		frame.getContentPane().add(buttonConnect);
-		
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setBackground(Color.WHITE);
-		lblNewLabel.setIcon(new ImageIcon("C:\\Users\\Spider man\\Desktop\\aspect4.jpg"));
-		lblNewLabel.setBounds(402, 8, 162, 121);
-		frame.getContentPane().add(lblNewLabel);
-		
 		JButton buttonLogout = new JButton("Logout");
 		buttonLogout.setBounds(223, 95, 81, 23);
 		frame.getContentPane().add(buttonLogout);
 		
 		passwordField = new JPasswordField();
+		passwordField.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				passwordField.setText("");
+			}
+		});
 		passwordField.setToolTipText("");
 		passwordField.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		passwordField.setBounds(83, 92, 116, 25);
@@ -159,30 +149,51 @@ public class ClientForm {
 		
 		JLabel lblGroup = new JLabel("Group");
 		lblGroup.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblGroup.setBounds(406, 135, 71, 25);
+		lblGroup.setBounds(377, 49, 71, 25);
 		frame.getContentPane().add(lblGroup);
 		
-		JRadioButton rdbtnSelectGroup = new JRadioButton("select group");
-		rdbtnSelectGroup.setBounds(406, 343, 109, 23);
-		frame.getContentPane().add(rdbtnSelectGroup);
+		JButton btnAddToChat = new JButton("Add");
 		
-		JTextPane textPaneGroupChat = new JTextPane();
-		textPaneGroupChat.setBounds(406, 160, 150, 176);
-		frame.getContentPane().add(textPaneGroupChat);
-		
-		JButton btnAddToChat = new JButton("Add to group");
-		btnAddToChat.setBounds(562, 376, 141, 30);
+		btnAddToChat.setBounds(508, 379, 71, 30);
 		frame.getContentPane().add(btnAddToChat);
 		
-		/*****connect to server for login*****/
-		buttonConnect.addMouseListener(new MouseAdapter() {
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 129, 334, 239);
+		frame.getContentPane().add(scrollPane);
+		
+		textAreaChat = new JTextArea();
+		textAreaChat.setLineWrap(true);
+		textAreaChat.setEditable(false);
+		scrollPane.setViewportView(textAreaChat);
+		textAreaChat.setRows(500);
+		
+		listGroup = new List();
+		listGroup.setFont(new Font("Dialog", Font.BOLD, 14));
+		listGroup.setForeground(new Color(0, 102, 51));
+		listGroup.setBounds(354, 77, 116, 226);
+		frame.getContentPane().add(listGroup);
+		
+		JButton btnRemove = new JButton("Remove");
+		btnRemove.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				client = new Client(textFieldHost.getText());
-				client.start();
+				listGroup.remove(userSelect);
 			}
 		});
+		btnRemove.setBounds(354, 309, 116, 23);
+		frame.getContentPane().add(btnRemove);
 		
+		JButton btnClearGroup = new JButton("Clear");
+		btnClearGroup.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				listGroup.clear();
+			}
+		});
+		btnClearGroup.setBounds(354, 345, 116, 23);
+		frame.getContentPane().add(btnClearGroup);
+		
+		/*****Exit out application*****/
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -192,13 +203,8 @@ public class ClientForm {
 					    "Shutdown",
 					    JOptionPane.YES_NO_OPTION);
 				if(keep == 0){
-					if(client != null){
-						client.close();
-					}
+					client.close();
 					System.exit(1);
-				}
-				else{
-					
 				}
 			}
 		});
@@ -208,15 +214,22 @@ public class ClientForm {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if(checkLogin){
-					client.send(textFieldMsg.getText());
-					textFieldMsg.setText("");
+					String msg = textFieldMsg.getText();
+					if(msg.indexOf("@") == 0){
+						String msgSend = getMsgMan(msg);
+						if(!msgSend.equals("")){
+							client.send(msgSend);
+						}
+					}
+					else if(msg.indexOf("$") == 0){
+						String msgSend = getMsgGroup(msg);
+						client.send(msgSend);
+					}
+					else{
+						String msgSend = getMsgAll(msg);
+						client.send(msgSend);
+					}
 				}
-//				String msg = "{\"\":\"\","
-//						+ " \"\": \"\","
-//						+ " \"\":\"\"  }";
-//				for(int i  = 0; i< listUserOnline.getItemCount() ; ++i){
-//					
-//				}
 			}
 		});
 		/**** login button ***/
@@ -224,10 +237,17 @@ public class ClientForm {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if(!checkLogin){
-					String msg = "{\"type\": \"acc\","
-							+ " \"acc\": \""+ textFieldAcc.getText() +" \", "
-							+ " \"pass\":\""+ passwordField.getText()+"\"  }";
-					client.send(msg);
+					if(!textFieldAcc.getText().equals("")&&
+							!passwordField.getText().equals("")){
+						String msg = "{\"type\": \"acc\","
+								+ " \"acc\": \""+ textFieldAcc.getText() +"\", "
+								+ " \"pass\":\""+ passwordField.getText()+"\"  }";
+						System.out.println(msg);
+						client.send(msg);
+					}
+					else{
+						textAreaChat.append("*********check again account or password !!!***\n");
+					}
 				}
 			}
 		});
@@ -235,9 +255,83 @@ public class ClientForm {
 		listUserOnline.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				int id = Integer.parseInt(e.getItem().toString());
-				userSelect = listUserOnline.getItem(id).getBytes().toString();
-				System.out.println(userSelect);
+				if(OnlineUser.listOnl.size() != 0 ){
+					userSelect = OnlineUser.listOnl.get(id);
+				}
+			}
+		});
+		/***Add user to group chat**/
+		btnAddToChat.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(userSelect != null){
+					System.out.println(userSelect);
+					listGroup.add(userSelect);
+				}
+			}
+		});
+		/****Logout event*****/
+		buttonLogout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				checkLogin = false;
+				textAreaChat.setText("\n\n***********You Logged !**********\n");
 			}
 		});
 	}
+	
+	public String getMsgAll(String msg){
+		textAreaChat.append("<Me>"+msg+"\n");
+		msg = "{ \"type\": \"msg\", \"name\" : \""+textFieldAcc.getText()
+				+"\", \"content\": \" "+msg+"\", \"recv\": [] }";
+		textFieldMsg.setText("");
+		return msg;
+	}
+	
+	public String getMsgGroup(String msg){
+		msg = msg.trim();
+		textAreaChat.append("<Me>"+msg+"\n");
+		String message = "{ \"type\": \"msg\", \"name\" : \""+textFieldAcc.getText()
+				+"\", \"content\": \" "+msg +"\", \"recv\": [";
+		int size  = listGroup.countItems();
+		for(int i = 0; i< size;++i){
+			if(i != size - 1){
+				message += "{ \"rname\" : \""+listGroup.getItem(i)+"\" },";
+			}
+			else{
+				message += "{ \"rname\" : \""+listGroup.getItem(i)+"\" }";
+			}
+		}
+		message += " ] }";
+		textFieldMsg.setText("");
+		return message;
+	}
+	
+	public String getMsgMan(String msg){
+		String message = "";
+		int endName = msg.indexOf(" ");
+		textAreaChat.append("<Me>"+msg+"\n");
+		String name = msg.substring(1, endName);
+		for(Map.Entry<Integer, String> entry : OnlineUser.listOnl.entrySet()){
+			if(name.equals(entry.getValue())){
+				message = "{ \"type\": \"msg\", \"name\" : \""+textFieldAcc.getText()+"\", \"content\": \" "+ 
+				msg.substring(endName).trim() +"\", \"recv\": [{ \"rname\" : \""+name.trim()+"\" }] }";
+			}
+		}
+		textFieldMsg.setText("");
+		return message;
+	}
+	
+	public JTextField textFieldAcc;
+	public JTextField textFieldHost;
+	private JPasswordField passwordField;
+	
+	private Client client = null;
+	private String userSelect = null;
+	
+	public static List listUserOnline;
+	public static JTextArea textAreaChat;
+	public JTextField textFieldMsg;
+	
+	public static boolean checkLogin = false;
 }

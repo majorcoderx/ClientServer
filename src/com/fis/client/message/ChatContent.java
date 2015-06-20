@@ -12,8 +12,7 @@
  *	]
  * }
  */
-
-package com.fis.server.message;
+package com.fis.client.message;
 
 import java.util.List;
 import java.util.Vector;
@@ -48,18 +47,23 @@ public class ChatContent {
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getContent() {
 		return content;
 	}
+
 	public void setContent(String content) {
 		this.content = content;
 	}
+
 	public List<String> getRecv() {
 		return recv;
 	}
+
 	public void setRecv(List<String> recv) {
 		this.recv = recv;
 	}

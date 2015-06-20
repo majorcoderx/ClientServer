@@ -1,4 +1,4 @@
-package com.fis.server.message;
+package com.fis.client.message;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -7,7 +7,7 @@ import org.json.simple.parser.ParseException;
 public class TypeMsg {
 	/*
 	 * {
-	 * 	"type" :" acc/msg/disconnect",
+	 * 	"type" :" acc/msg",
 	 *   .........,
 	 *   .........,
 	 * }
@@ -23,13 +23,13 @@ public class TypeMsg {
 			e.printStackTrace();
 			return -1;
 		}
-		if(type.equals("acc")){
+		if(type.equals("result")){
 			return 0;
 		}
 		if(type.equals("msg")){
 			return 1;
 		}
-		if(type.equals("disconnect")){
+		if(type.equals("online")){
 			return 2;
 		}
 		return -1;

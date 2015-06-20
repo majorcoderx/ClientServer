@@ -21,78 +21,86 @@ public class clientThread extends Thread{
 	
 	public clientThread(Socket clientSocket){
 		this.clientSocket = clientSocket;
-		System.out.println("Port of Client: "+this.clientSocket.getPort());
+	}
+	
+	public void newStreamConnect() throws IOException{
+		os = new DataOutputStream(clientSocket.getOutputStream());
+		is = new DataInputStream(clientSocket.getInputStream());
 	}
 	
 	public void run(){
 		try{
-			System.out.println("Bat dau thread " + this.clientSocket.getPort());
-			this.os = new DataOutputStream(clientSocket.getOutputStream());
-			this.is = new DataInputStream(clientSocket.getInputStream());
-			
+			newStreamConnect();
 			String msg;
 			while(true){
-				msg = this.is.readUTF();
-				System.out.println("msg client :" + msg);
-				
+				msg = is.readUTF();
 				if(Type.ACCOUNT == TypeMsg.getType(msg)){
-					//connect check db
-					user = new UserContent(msg);
-					if(Login.checkAccount(user.getAcc(), user.getPass())){
-						this.os.writeUTF("[login@true]");
-						this.os.flush();
-					}
-					else{
-						this.os.writeUTF("[login@false]");
-						this.os.flush();
-						this.os.close();
-						this.is.close();
-						this.clientSocket.close();
-						Server.vSocket.remove(this);
-						break;
-					}
+					loginDB(msg);
 				}
 				if(Type.MESSAGE == TypeMsg.getType(msg)){
-					message = new ChatContent(msg);
-					int size = Server.vSocket.size();
-					for(int i = 0; i< size;++i){
-						if(msg.equals("@quit")){
-							this.os.close();
-							this.is.close();
-							this.clientSocket.close();
-							Server.vSocket.remove(i);
-							break;
-						}
-						if(this.message.getRecv().size() == 0){
-							Server.vSocket.get(i).os.writeUTF(msg);
-							Server.vSocket.get(i).os.flush();
-						}
-						else{
-							for(int j = 0 ; j < this.message.getRecv().size(); ++i){
-								if(this.message.getRecv().get(j).equals(
-										Server.vSocket.get(i).message.getName())){
-									
-									Server.vSocket.get(i).os.writeUTF(msg);
-									Server.vSocket.get(i).os.flush();
-								}
-							}
-						}
-					}
+					sendMessage(msg);
+				}
+				if(Type.DISCONNECT == TypeMsg.getType(msg)){
+					disconnectClient();
+					break;
 				}
 			}
+			
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void loginDB(String msg) throws IOException{
+		user = new UserContent(msg);		
+		if(Login.checkAccount(user.getAcc(), user.getPass())){
+			os.writeUTF("{\"type\":\"result\", \"value\": \"true\"}");
+			os.flush();
+		}
+		else{
+			os.writeUTF("{\"type\":\"result\", \"value\": \"false\"}");
+			os.flush();
+		}
+	}
+	
+	public void sendMessage(String msg) throws IOException{
+		message = new ChatContent(msg);
+		int size = Server.vSocket.size();
+		for(int i = 0; i< size;++i){
+			if(this.message.getRecv().size() == 0){
+				if(!Server.vSocket.get(i).user.getAcc().equals(user.getAcc())){
+					Server.vSocket.get(i).os.writeUTF(msg);
+					Server.vSocket.get(i).os.flush();
+				}
+			}
+			else{
+				for(int j = 0 ; j < this.message.getRecv().size(); ++j){
+					System.out.println("NGUOI NHAN TRONG MSG : " + message.getRecv().get(j));
+					System.out.println("NGUOI NHAN : " +Server.vSocket.get(i).user.getAcc() );
+					if(message.getRecv().get(j).equals(
+							Server.vSocket.get(i).user.getAcc())){
+						System.out.println("GUI GOI TIN: "+ msg);
+						Server.vSocket.get(i).os.writeUTF(msg);
+						Server.vSocket.get(i).os.flush();
+					}
+				}
+			}
+		}
+	}
+	
+	public void disconnectClient() throws IOException{
+		os.close();
+		is.close();
+		clientSocket.close();
+		Server.vSocket.remove(this);
 	}
 
 	public UserContent getUser() {
 		return user;
 	}
-
 	public Socket getClientSocket() {
 		return clientSocket;
 	}
-
 	public DataOutputStream getOs() {
 		return os;
 	}

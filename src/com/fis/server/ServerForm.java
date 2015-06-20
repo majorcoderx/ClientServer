@@ -4,8 +4,6 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextPane;
-import javax.swing.JScrollPane;
 import javax.swing.JButton;
 
 import java.awt.List;
@@ -17,12 +15,13 @@ import java.awt.event.WindowEvent;
 import javax.swing.JLabel;
 
 import java.awt.Font;
-import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.swing.JTextField;
 
 import com.fis.server.orcl.ConnectDB;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 
 public class ServerForm {
 
@@ -31,9 +30,10 @@ public class ServerForm {
 	public JTextField textFieldPort;
 	
 	private Server server = null;
-	
-	public static JTextPane textPaneChat;
 	public static List listServer;
+	public boolean checkOpenServer = false;
+	
+	public static JTextArea textAreaChat;
 	/**
 	 * Launch the application.
 	 */
@@ -71,7 +71,7 @@ public class ServerForm {
 		btnClear.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				
+				textAreaChat.setText("");
 			}
 		});
 		btnClear.setBounds(10, 288, 90, 36);
@@ -81,6 +81,7 @@ public class ServerForm {
 		btnClose.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				System.exit(1);
 			}
 		});
 		btnClose.setBounds(335, 288, 109, 36);
@@ -93,7 +94,7 @@ public class ServerForm {
 		
 		listServer = new List();
 		listServer.setFont(new Font("Dialog", Font.ITALIC, 13));
-		listServer.setBounds(335, 41, 109, 235);
+		listServer.setBounds(324, 41, 120, 235);
 		frame.getContentPane().add(listServer);
 		
 		textFieldHost = new JTextField();
@@ -120,17 +121,27 @@ public class ServerForm {
 		frame.getContentPane().add(textFieldPort);
 		textFieldPort.setColumns(10);
 		
-		textPaneChat = new JTextPane();
-		textPaneChat.setBounds(10, 79, 308, 198);
-		frame.getContentPane().add(textPaneChat);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 79, 308, 198);
+		frame.getContentPane().add(scrollPane);
+		
+		textAreaChat = new JTextArea();
+		textAreaChat.setEditable(false);
+		scrollPane.setViewportView(textAreaChat);
 		
 		btnOpen.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent pres) {
-				new ConnectDB();
-				server = new Server(Integer.parseInt(textFieldPort.getText()),
-						textFieldHost.getText());
-				server.start();
+				if(!checkOpenServer){
+					new ConnectDB();
+					server = new Server(Integer.parseInt(textFieldPort.getText()),
+							textFieldHost.getText());
+					server.start();
+					checkOpenServer = true;
+				}
+				else{
+					textAreaChat.append("***Server FIS already !!!***\n");
+				}
 			}
 		});
 		

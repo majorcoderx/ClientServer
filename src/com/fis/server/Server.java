@@ -21,18 +21,19 @@ public class Server extends Thread{
 	private String hostname = null;
 	private int port;
 	public static Vector<clientThread> vSocket =  null;
+	
 	public Server(int port, String host){
 		this.port = port;
 		this.hostname = host;
-		System.out.println(this.port);
 	}
 	
 	public void run() {
 		vSocket = new Vector<clientThread>();
-		
 		new ConnectDB();
 		try{
-			serverSocket = new ServerSocket(this.port);
+			serverSocket = new ServerSocket(port);
+			ServerForm.textAreaChat.append(">>>>HOST NAME: " + hostname + ", PORT: " + port+ "\n");
+			ServerForm.textAreaChat.append("****OPEN SERVER - START WORKING !!!***\n");
 			while(true){
 				clientSocket = serverSocket.accept();
 				vSocket.add(0, new clientThread(clientSocket));
@@ -44,7 +45,6 @@ public class Server extends Thread{
 			e.printStackTrace();
 		}
 	}
-	
 	public void close(){
 		try{
 			if(serverSocket != null){

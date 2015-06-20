@@ -9,7 +9,9 @@ public class Login {
 		String sql = "select * from account where acc = '"+acc+"'";
 		try{
 			ConnectDB.rs =  ConnectDB.st.executeQuery(sql);
-			check = true;
+			while(ConnectDB.rs.next()){
+				check = true;
+			}
 		}catch(SQLException e){
 			e.printStackTrace();
 		}

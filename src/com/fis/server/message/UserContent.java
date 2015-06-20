@@ -1,3 +1,12 @@
+/*
+ * {
+ * 	"type" : "",
+ * 	"acc" : "",
+ * 	"pass":""
+ * } 
+ * 
+ */
+
 package com.fis.server.message;
 
 import org.json.simple.JSONObject;
@@ -5,15 +14,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class UserContent {
-	/*
-	 * {
-	 * 	"type" : "",
-	 * 	"acc" : "",
-	 * 	"pass":""
-	 * } 
-	 * 
-	 */
-	
 	private String acc;
 	private String pass;
 	public UserContent(String jsonString){

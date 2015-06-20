@@ -5,7 +5,7 @@
  * 
  * type of  json string
  * {
- * 	"type" : "onlien",
+ * 	"type" : "online",
  * 	"user" : [
  * 		{
  * 			"name": "---",
@@ -28,9 +28,9 @@ public class OnlineUser extends Thread {
 	private String msg;
 	
 	public void run(){
-		lUO =  new LinkedList<String>();
 		try{
 			while(true){
+				lUO =  new LinkedList<String>();
 				msg  = "{ \"type\": \"online\", \"user\" :[  ";
 				for(int  i = 0;i < Server.vSocket.size(); ++i){
 					if(Server.vSocket.get(i).getUser() != null){
@@ -51,14 +51,12 @@ public class OnlineUser extends Thread {
 						Server.vSocket.get(i).getOs().writeUTF(msg);
 					}
 				}
-				Thread.sleep(3000);
+				Thread.sleep(32000);
 			}
 		}catch(IOException e){
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 }
