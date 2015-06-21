@@ -12,9 +12,9 @@ public class TypeMsg {
 	 *   .........,
 	 * }
 	 * 
-	 */
-	private static String type;
-	public static int getType(String jsonString){
+	 */ 
+	public static synchronized int getType(String jsonString){
+		String type;
 		try{
 			JSONParser jsonParser = new JSONParser();
 			JSONObject jOb = (JSONObject) jsonParser.parse(jsonString);
