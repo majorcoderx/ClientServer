@@ -13,7 +13,7 @@ public class TypeMsg {
 	 * }
 	 * 
 	 */ 
-	public static synchronized int getType(String jsonString){
+	public static int getType(String jsonString){
 		String type;
 		try{
 			JSONParser jsonParser = new JSONParser();

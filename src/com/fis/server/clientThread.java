@@ -75,8 +75,6 @@ public class clientThread extends Thread{
 			}
 			else{
 				for(int j = 0 ; j < this.message.getRecv().size(); ++j){
-					System.out.println("NGUOI NHAN TRONG MSG : " + message.getRecv().get(j));
-					System.out.println("NGUOI NHAN : " +Server.vSocket.get(i).user.getAcc() );
 					if(message.getRecv().get(j).equals(
 							Server.vSocket.get(i).user.getAcc())){
 						System.out.println("GUI GOI TIN: "+ msg);
