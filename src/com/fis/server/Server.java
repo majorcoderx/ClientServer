@@ -20,7 +20,8 @@ public class Server extends Thread{
 	private ServerSocket serverSocket = null;
 	private String hostname = null;
 	private int port;
-	public static Vector<clientThread> vSocket =  null;
+	public static Vector<ClientThread> vSocket =  null;
+	private boolean ckRunOline = false;
 	
 	public Server(int port, String host){
 		this.port = port;
@@ -28,23 +29,29 @@ public class Server extends Thread{
 	}
 	
 	public void run() {
-		vSocket = new Vector<clientThread>();
+		vSocket = new Vector<ClientThread>();
 		new ConnectDB();
+		OnlineUser onl = new OnlineUser();
 		try{
 			serverSocket = new ServerSocket(port);
 			ServerForm.textAreaChat.append(">>>>HOST NAME: " + hostname + ", PORT: " + port+ "\n");
 			ServerForm.textAreaChat.append("****OPEN SERVER - START WORKING !!!***\n");
 			while(true){
 				clientSocket = serverSocket.accept();
-				vSocket.add(0, new clientThread(clientSocket));
+				vSocket.add(0, new ClientThread(clientSocket));
 				vSocket.firstElement().start();
-				OnlineUser onl = new OnlineUser();
-				onl.start();
+				if(!ckRunOline){
+					onl.start();
+					ckRunOline = true;
+				}
 			}
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
 	public void close(){
 		try{
 			if(serverSocket != null){

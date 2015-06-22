@@ -11,7 +11,7 @@ import com.fis.server.message.TypeMsg;
 import com.fis.server.message.UserContent;
 import com.fis.server.orcl.Login;
 
-public class clientThread extends Thread{
+public class ClientThread extends Thread{
 	
 	private ChatContent message = null;
 	private UserContent user = null;
@@ -19,7 +19,7 @@ public class clientThread extends Thread{
 	private DataOutputStream os = null;
 	private Socket clientSocket = null;
 	
-	public clientThread(Socket clientSocket){
+	public ClientThread(Socket clientSocket){
 		this.clientSocket = clientSocket;
 	}
 	
