@@ -17,19 +17,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JPasswordField;
-
 import com.fis.client.message.OnlineUser;
-
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
-import java.io.ObjectInputStream.GetField;
 import java.util.Map;
-
 import javax.swing.JTextArea;
-import javax.swing.JScrollBar;
-import javax.swing.DropMode;
 import javax.swing.JScrollPane;
 
 public class ClientForm {

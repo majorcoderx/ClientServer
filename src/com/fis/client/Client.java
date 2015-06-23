@@ -47,6 +47,7 @@ public class Client extends Thread{
 			e.printStackTrace();
 			ClientForm.textAreaChat.append("**Server disconnect, check your internet !!!**\n");
 			ClientForm.checkLogin = false;
+			System.exit(1);
 		}
 	}
 	
