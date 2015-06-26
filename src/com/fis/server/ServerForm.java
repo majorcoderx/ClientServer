@@ -30,7 +30,7 @@ public class ServerForm {
 	public JTextField textFieldPort;
 	
 	private Server server = null;
-	public static List listServer;
+	public static List listUser;
 	public boolean checkOpenServer = false;
 	
 	public static JTextArea textAreaChat;
@@ -92,10 +92,10 @@ public class ServerForm {
 		btnOpen.setBounds(160, 288, 109, 36);
 		frame.getContentPane().add(btnOpen);
 		
-		listServer = new List();
-		listServer.setFont(new Font("Dialog", Font.ITALIC, 13));
-		listServer.setBounds(324, 41, 120, 235);
-		frame.getContentPane().add(listServer);
+		listUser = new List();
+		listUser.setFont(new Font("Dialog", Font.ITALIC, 13));
+		listUser.setBounds(324, 41, 120, 235);
+		frame.getContentPane().add(listUser);
 		
 		textFieldHost = new JTextField();
 		textFieldHost.setFont(new Font("Tahoma", Font.PLAIN, 13));

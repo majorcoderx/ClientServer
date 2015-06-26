@@ -48,10 +48,10 @@ public class OnlineUser extends Thread {
 				msg += " ]}";
 				for(int i = 0; i < Server.vSocket.size(); ++i){
 					if(Server.vSocket.get(i).getOs() != null){
-						Server.vSocket.get(i).getOs().writeUTF(msg);
+						Server.vSocket.get(i).getOs().writeUTF(msg+ "\r\n");
 					}
 				}
-				Thread.sleep(32000);
+				Thread.sleep(16000);
 			}
 		}catch(IOException e){
 			e.printStackTrace();

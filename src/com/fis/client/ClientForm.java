@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 
 import java.awt.List;
 
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -17,13 +18,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JPasswordField;
-import com.fis.client.message.OnlineUser;
+
+import com.fis.client.chatgroup.GroupChatForm;
+import com.fis.client.message.OnlineAnalyst;
+
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.util.LinkedList;
 import java.util.Map;
+
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ClientForm {
 
@@ -54,9 +64,25 @@ public class ClientForm {
 		initialize();
 		textFieldAcc.setText("account");
 		passwordField.setText("123456");
+		lGroup = new LinkedList<GroupChatForm>();
+		
+		JButton btnNewButton = new JButton("Create group");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				GroupChatForm gChat = new GroupChatForm();
+				lGroup.add(gChat);
+				gChat.frame.setVisible(true);
+				System.out.println(lGroup.size());
+			}
+		});
+		btnNewButton.setBounds(354, 14, 116, 29);
+		frame.getContentPane().add(btnNewButton);
 		client = new Client(textFieldHost.getText());
 		client.start();
 	}
+	
+	public static java.util.List<GroupChatForm> lGroup;
 
 	/**
 	 * Initialize the contents of the frame.
@@ -101,7 +127,7 @@ public class ClientForm {
 		textFieldHost = new JTextField();
 		textFieldHost.setFont(new Font("Tahoma", Font.ITALIC, 13));
 		textFieldHost.setText("localhost");
-		textFieldHost.setBounds(83, 12, 387, 25);
+		textFieldHost.setBounds(83, 12, 256, 25);
 		frame.getContentPane().add(textFieldHost);
 		textFieldHost.setColumns(10);
 		
@@ -140,9 +166,9 @@ public class ClientForm {
 		passwordField.setBounds(83, 92, 116, 25);
 		frame.getContentPane().add(passwordField);
 		
-		JLabel lblGroup = new JLabel("Group");
+		JLabel lblGroup = new JLabel("Send Multi");
 		lblGroup.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblGroup.setBounds(377, 49, 71, 25);
+		lblGroup.setBounds(364, 54, 96, 25);
 		frame.getContentPane().add(lblGroup);
 		
 		JButton btnAddToChat = new JButton("Add");
@@ -223,6 +249,7 @@ public class ClientForm {
 						client.send(msgSend);
 					}
 				}
+				textFieldMsg.setText("");
 			}
 		});
 		/**** login button ***/
@@ -248,8 +275,8 @@ public class ClientForm {
 		listUserOnline.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				int id = Integer.parseInt(e.getItem().toString());
-				if(OnlineUser.listOnl.size() != 0 ){
-					userSelect = OnlineUser.listOnl.get(id);
+				if(OnlineAnalyst.listOnl.size() != 0 ){
+					userSelect = OnlineAnalyst.listOnl.get(id);
 				}
 			}
 		});
@@ -277,7 +304,7 @@ public class ClientForm {
 		textAreaChat.append("<Me>"+msg+"\n");
 		msg = "{ \"type\": \"msg\", \"name\" : \""+textFieldAcc.getText()
 				+"\", \"content\": \" "+msg+"\", \"recv\": [] }";
-		textFieldMsg.setText("");
+		//textFieldMsg.setText("");
 		return msg;
 	}
 	
@@ -296,30 +323,32 @@ public class ClientForm {
 			}
 		}
 		message += " ] }";
-		textFieldMsg.setText("");
+		//textFieldMsg.setText("");
 		return message;
 	}
+	
+	
 	
 	public String getMsgMan(String msg){
 		String message = "";
 		int endName = msg.indexOf(" ");
 		textAreaChat.append("<Me>"+msg+"\n");
 		String name = msg.substring(1, endName);
-		for(Map.Entry<Integer, String> entry : OnlineUser.listOnl.entrySet()){
+		for(Map.Entry<Integer, String> entry : OnlineAnalyst.listOnl.entrySet()){
 			if(name.equals(entry.getValue())){
 				message = "{ \"type\": \"msg\", \"name\" : \""+textFieldAcc.getText()+"\", \"content\": \" "+ 
 				msg.substring(endName).trim() +"\", \"recv\": [{ \"rname\" : \""+name.trim()+"\" }] }";
 			}
 		}
-		textFieldMsg.setText("");
+		//textFieldMsg.setText("");
 		return message;
 	}
 	
-	public JTextField textFieldAcc;
+	public static JTextField textFieldAcc;
 	public JTextField textFieldHost;
 	private JPasswordField passwordField;
 	
-	private Client client = null;
+	public static Client client = null;
 	private String userSelect = null;
 	
 	public static List listUserOnline;
@@ -328,3 +357,7 @@ public class ClientForm {
 	
 	public static boolean checkLogin = false;
 }
+
+
+
+

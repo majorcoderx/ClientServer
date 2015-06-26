@@ -1,6 +1,6 @@
 package com.fis.client;
 
-import com.fis.client.message.OnlineUser;
+import com.fis.client.chatgroup.GroupChatForm;
 import com.fis.client.message.*;
 
 import java.io.DataInputStream;
@@ -16,7 +16,7 @@ public class Client extends Thread{
 	private DataOutputStream os = null;
 	private Socket clientSocket;
 	private String msg;
-	private ChatContent chatMsg;
+	private ChatAnalyst chatMsg;
 	private final int port = 10008;
 	private boolean ckRun = true;
 	
@@ -26,22 +26,28 @@ public class Client extends Thread{
 	
 	public void run() {
 		try{
+			
 			clientSocket = new Socket(host, port);
 			ClientForm.textAreaChat.append("***Connect to FIS Server success !!!***\n\n");
 			os = new DataOutputStream(clientSocket.getOutputStream());
 			is = new DataInputStream(clientSocket.getInputStream());
+//			sendDemo();
 			while(ckRun){
 				msg = is.readUTF();
 				System.out.println("MSG SERVER GUI VE: "+msg);
-				if(TypeMsg.getType(msg) == Type.RESULT){
+				Analyst analyst = new Analyst(msg);
+				if(analyst.type.equals(Key.RESULT)){
 					getResultLogin(msg);
 				}
-				if (TypeMsg.getType(msg) == Type.MESSAGE) {
+				if (analyst.type.equals(Key.MESSAGE)) {
 					getMessage(msg);
 				}
-				if (TypeMsg.getType(msg) == Type.ONLINE) {
+				if (analyst.type.equals(Key.ONLINE)) {
 					getListOnline(msg);
-				}	
+				}
+				if(analyst.type.equals(Key.GROUP)){
+					getMsgGroup(msg);
+				}
 			}
 		}catch(IOException e){
 			e.printStackTrace();
@@ -51,8 +57,43 @@ public class Client extends Thread{
 		}
 	}
 	
+	public void getMsgGroup(String msg){
+		GroupAnalyst gAnalyst = new GroupAnalyst(msg);
+		boolean check = true;
+		for(int i = 0 ; i < ClientForm.lGroup.size(); ++i){
+			if(ClientForm.lGroup.get(i).textFieldNameGroup.getText().equals(gAnalyst.getNameGroup())){
+				if(gAnalyst.typeGroup().equals(Key.MESSAGE)){
+					ClientForm.lGroup.get(i).textAreaChatGroup.append("<" +gAnalyst.getSender()+ ">>>"
+								+ gAnalyst.getContent()+"\n");
+				}
+				if(gAnalyst.typeGroup().equals(Key.CHANGE)){
+					ClientForm.lGroup.get(i).listGroupChat.removeAll();
+					for (int j = 0; j < gAnalyst.getOnline().size(); ++j) {
+						ClientForm.lGroup.get(i).listGroupChat.add(gAnalyst.getOnline().get(j));
+					}
+				}
+				check = false;
+			}
+		}
+		if(check){
+			GroupChatForm gChat = new GroupChatForm();
+			gChat.frame.setVisible(true);
+			gChat.textFieldNameGroup.setText(gAnalyst.getNameGroup());
+			if(gAnalyst.typeGroup().equals(Key.MESSAGE)){
+				gChat.textAreaChatGroup.append("<" +gAnalyst.getSender()+ ">>>"
+						+ gAnalyst.getContent() + "\n");
+			}
+			if(gAnalyst.typeGroup().equals(Key.CHANGE)){
+				for (int j = 0; j < gAnalyst.getOnline().size(); ++j) {
+					gChat.listGroupChat.add(gAnalyst.getOnline().get(j));
+				}
+			}
+			ClientForm.lGroup.add(gChat);
+		}
+	}
+	
 	public void getResultLogin(String msg){
-		ResultLogin rsLog = new ResultLogin(msg);
+		ResultAnalyst rsLog = new ResultAnalyst(msg);
 		if(rsLog.result){
 			welcomeChat();
 			ClientForm.checkLogin = true;
@@ -64,22 +105,22 @@ public class Client extends Thread{
 	}
 	
 	public void getMessage(String msg){
-		chatMsg = new ChatContent(msg);
+		chatMsg = new ChatAnalyst(msg);
 		String s = "<"+chatMsg.getName()+ " >>>" + chatMsg.getContent();
 		ClientForm.textAreaChat.append(s+"\n");
 	}
 	
 	public void getListOnline(String msg){
 		ClientForm.listUserOnline.removeAll();
-		new OnlineUser(msg);
-		for(Map.Entry<Integer, String> entry : OnlineUser.listOnl.entrySet()){
+		new OnlineAnalyst(msg);
+		for(Map.Entry<Integer, String> entry : OnlineAnalyst.listOnl.entrySet()){
 			ClientForm.listUserOnline.add(entry.getValue(), entry.getKey());
 		}
 	}
 
 	public void close(){
 		try{
-			this.os.writeUTF("{ \"type\": \"disconnect\"}");
+			this.os.writeUTF("{ \"type\": \"dis\"} \r\n");
 			ckRun = false;
 		}catch(IOException e){
 			e.printStackTrace();
@@ -88,9 +129,8 @@ public class Client extends Thread{
 	
 	public void send(String msg){
 		try{
-			os.writeUTF(msg);
+			os.writeUTF(msg+ "\r\n");
 			System.out.println(msg);
-			os.flush();
 		}catch (IOException e) {
 			e.printStackTrace();
 		}

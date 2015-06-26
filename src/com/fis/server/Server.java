@@ -8,7 +8,8 @@ package com.fis.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import com.fis.server.orcl.ConnectDB;
@@ -23,12 +24,15 @@ public class Server extends Thread{
 	public static Vector<ClientThread> vSocket =  null;
 	private boolean ckRunOline = false;
 	
+	public static List<Group> listGroup;
+	
 	public Server(int port, String host){
 		this.port = port;
 		this.hostname = host;
 	}
 	
 	public void run() {
+		listGroup = new LinkedList<Group>();
 		vSocket = new Vector<ClientThread>();
 		new ConnectDB();
 		OnlineUser onl = new OnlineUser();
